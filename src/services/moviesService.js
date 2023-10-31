@@ -23,3 +23,23 @@ export const findAllAvailableMovies = async () => {
     ],
   });
 };
+
+export const bookMovieById = async movieId => {
+  const movie = await Movie.findById(movieId);
+
+  if (!movie) {
+    return { error: true, message: 'Movie not found' };
+  }
+
+  if (movie.reservation.status === 'RESERVED') {
+    return { error: true, message: 'Movie is already reserved' };
+  }
+
+  movie.reservation.status = 'RESERVED';
+  movie.reservation.reservedAt = new Date();
+  movie.status = 'UNAVAILABLE';
+
+  await movie.save();
+
+  return { reservation: movie.reservation };
+};
