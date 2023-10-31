@@ -15,11 +15,9 @@ export const findAllAvailableMovies = async () => {
 
   return Movie.find({
     $or: [
-      { 'reservation.status': 'NOT_RESERVED' },
-      {
-        'reservation.status': 'RESERVED',
-        'reservation.reservedAt': { $gt: threeHoursAgo },
-      },
+      { 'reservation.status': { $ne: 'RESERVED' } },
+      { 'reservation.reservedAt': { $lt: threeHoursAgo } },
+      { reservation: { $exists: false } },
     ],
   });
 };
