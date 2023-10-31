@@ -11,17 +11,12 @@ export const listMovies = async (req, res) => {
 
 export const bookMovie = async (req, res) => {
   try {
-    const { movieId } = req.body;
-    const result = await moviesService.bookMovieById(movieId);
-
-    if (result.error) {
-      res.status(400).json({ message: result.message });
-    } else {
-      res.json({
-        message: 'Movie successfully booked',
-        reservation: result.reservation,
-      });
-    }
+    const { movieId, customerId } = req.body;
+    const reservation = await moviesService.bookMovie(movieId, customerId);
+    res.json({
+      reserveId: reservation._id.toString(),
+      status: reservation.status,
+    });
   } catch (error) {
     res.status(500).send(error.message);
   }

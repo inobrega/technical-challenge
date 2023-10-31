@@ -28,24 +28,32 @@ export const findAllAvailableMovies = async () => {
   }));
 };
 
-export const bookMovieById = async movieId => {
+export const bookMovie = async (movieId, customerId) => {
   const movie = await Movie.findById(movieId);
 
   if (!movie) {
-    return { error: true, message: 'Movie not found' };
+    throw new Error('Movie not found');
   }
 
-  if (movie.reservation.status === 'RESERVED') {
-    return { error: true, message: 'Movie is already reserved' };
+  if (movie.reservation) {
+    if (movie.reservation.status === 'WAITING') {
+      throw new Error('Movie is already reserved');
+    }
+
+    const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000);
+    if (movie.reservation.reservedAt > threeHoursAgo) {
+      throw new Error('Movie can only be reserved once every three hours');
+    }
   }
 
-  movie.reservation.status = 'RESERVED';
-  movie.reservation.reservedAt = new Date();
-  movie.status = 'UNAVAILABLE';
+  movie.reservation = {
+    customerId: customerId,
+    reservedAt: new Date(),
+    status: 'WAITING',
+  };
 
-  await movie.save();
-
-  return { reservation: movie.reservation };
+  const updatedMovie = await movie.save();
+  return updatedMovie.reservation;
 };
 
 export const createMovie = async movieData => {
