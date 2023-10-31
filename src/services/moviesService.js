@@ -13,13 +13,19 @@ export const findAllAvailableMovies = async () => {
     },
   );
 
-  return Movie.find({
+  const movies = await Movie.find({
     $or: [
       { 'reservation.status': { $ne: 'RESERVED' } },
       { 'reservation.reservedAt': { $lt: threeHoursAgo } },
       { reservation: { $exists: false } },
     ],
-  });
+  }).select('_id name synopsis rating');
+  return movies.map(movie => ({
+    id: movie._id,
+    name: movie.name,
+    synopsis: movie.synopsis,
+    rating: movie.rating,
+  }));
 };
 
 export const bookMovieById = async movieId => {
