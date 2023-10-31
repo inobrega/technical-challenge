@@ -11,7 +11,7 @@ const reservationSchema = new mongoose.Schema({
   rentedAt: Date,
   status: {
     type: String,
-    enum: ['RESERVED', 'NOT_RESERVED', 'WAITING'],
+    enum: ['RESERVED', 'NOT_RESERVED', 'WAITING', 'LEASED', 'RETURNED'],
     default: 'NOT_RESERVED',
   },
 });
@@ -35,7 +35,7 @@ const movieSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      enum: ['AVAILABLE', 'UNAVAILABLE'],
+      enum: ['AVAILABLE', 'NOT_AVAILABLE'],
       default: 'AVAILABLE',
     },
     reservation: reservationSchema,

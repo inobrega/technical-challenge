@@ -1,4 +1,5 @@
 import Movie from '../models/movie.js';
+import Customer from '../models/customer.js';
 
 export const findAllAvailableMovies = async () => {
   const threeHoursAgo = new Date(new Date() - 3 * 60 * 60 * 1000);
@@ -82,4 +83,51 @@ export const deleteMovie = async movieId => {
   }
 
   await movie.remove();
+};
+
+export const confirmRental = async (reservationId, customerData) => {
+  const movie = await Movie.findOne({ 'reservation._id': reservationId });
+
+  if (!movie) {
+    throw new Error('Reservation not found');
+  }
+
+  if (movie.reservation.status !== 'WAITING') {
+    throw new Error('Reservation is not in a confirmable state');
+  }
+
+  let customer = await Customer.findOne({ email: customerData.email });
+  if (!customer) {
+    customer = new Customer(customerData);
+    await customer.save();
+  }
+
+  movie.reservation.status = 'LEASED';
+  movie.status = 'NOT_AVAILABLE';
+  movie.reservation.customerId = customer._id;
+
+  const updatedMovie = await movie.save();
+
+  return {
+    scheduleId: updatedMovie.reservation._id,
+    status: updatedMovie.reservation.status,
+  };
+};
+
+export const returnMovie = async scheduleId => {
+  const movie = await Movie.findOne({ 'reservation._id': scheduleId });
+
+  if (!movie) {
+    throw new Error('Reservation not found.');
+  }
+
+  movie.status = 'AVAILABLE';
+  movie.reservation.status = 'RETURNED';
+
+  await movie.save();
+
+  return {
+    scheduleId: movie.reservation._id.toString(),
+    status: movie.reservation.status,
+  };
 };
