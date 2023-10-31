@@ -1,27 +1,21 @@
 import express from 'express';
-import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import routes from './src/routes.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT;
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-app.get('/api/test', async (req, res) => {
-  const filmes = [
-    { id: 1, nome: 'Filme 1' },
-    { id: 2, nome: 'Filme 2' },
-  ];
-  res.status(200).json(filmes);
-});
+app.use('/api', routes);
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
