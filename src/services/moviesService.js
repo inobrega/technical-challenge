@@ -35,6 +35,10 @@ export const bookMovie = async (movieId, customerId) => {
     throw new Error('Movie not found');
   }
 
+  if (movie.status !== 'AVAILABLE') {
+    throw new Error('Movie is not available for reservation');
+  }
+
   if (movie.reservation) {
     if (movie.reservation.status === 'WAITING') {
       throw new Error('Movie is already reserved');
