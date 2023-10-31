@@ -43,3 +43,27 @@ export const bookMovieById = async movieId => {
 
   return { reservation: movie.reservation };
 };
+
+export const createMovie = async movieData => {
+  const newMovie = new Movie(movieData);
+  return newMovie.save();
+};
+
+export const updateMovie = async (movieId, movieUpdates) => {
+  const movie = await Movie.findById(movieId);
+  if (!movie) {
+    throw new Error('Movie not found');
+  }
+
+  Object.assign(movie, movieUpdates);
+  return movie.save();
+};
+
+export const deleteMovie = async movieId => {
+  const movie = await Movie.findById(movieId);
+  if (!movie) {
+    throw new Error('Movie not found');
+  }
+
+  await movie.remove();
+};

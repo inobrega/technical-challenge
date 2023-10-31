@@ -26,3 +26,33 @@ export const bookMovie = async (req, res) => {
     res.status(500).send(error.message);
   }
 };
+
+export const createMovie = async (req, res) => {
+  try {
+    const newMovie = await moviesService.createMovie(req.body);
+    res.status(201).json(newMovie);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
+
+export const updateMovie = async (req, res) => {
+  try {
+    const { movieId } = req.params;
+    const movieUpdates = req.body;
+    const updatedMovie = await moviesService.updateMovie(movieId, movieUpdates);
+    res.json(updatedMovie);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
+
+export const deleteMovie = async (req, res) => {
+  try {
+    const { movieId } = req.params;
+    await moviesService.deleteMovie(movieId);
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
